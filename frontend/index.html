@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="theme-color" content="#09090B" />
+    <meta name="color-scheme" content="dark" />
+    <meta
+      name="description"
+      content="MBTI Chaos Debate Sandbox · 8 个 MBTI 人格的本地多 Agent 辩论沙盒 · 完全离线"
+    />
+
+    <title>MBTI Chaos Debate · 沙盒</title>
+
+    <!-- 防 FOUC: 在 main.css 加载前先涂上深色背景 + 默认字体 -->
+    <style>
+      html,
+      body,
+      #app {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+        background-color: #09090b;
+        color: #e4e4e7;
+        font-family:
+          'Inter',
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          Roboto,
+          'Helvetica Neue',
+          Arial,
+          'PingFang SC',
+          'Hiragino Sans GB',
+          'Microsoft YaHei',
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+        overscroll-behavior: none;
+      }
+
+      body {
+        overflow: hidden;
+      }
+
+      /* 启动骨架: 在 Vue 挂载前显示,挂载后被覆盖 */
+      .boot-skeleton {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 16px;
+        background:
+          radial-gradient(
+            ellipse at top,
+            rgba(6, 182, 212, 0.06),
+            transparent 60%
+          ),
+          radial-gradient(
+            ellipse at bottom,
+            rgba(217, 70, 239, 0.04),
+            transparent 60%
+          ),
+          #09090b;
+        font-family:
+          'JetBrains Mono', ui-monospace, 'SF Mono', 'Cascadia Code',
+          Menlo, monospace;
+        font-size: 13px;
+        color: #71717a;
+        letter-spacing: 0.05em;
+        user-select: none;
+      }
+
+      .boot-skeleton__title {
+        font-size: 14px;
+        color: #a1a1aa;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+      }
+
+      .boot-skeleton__pulse {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #06b6d4;
+        box-shadow: 0 0 12px #06b6d4;
+        animation: boot-pulse 1.4s ease-in-out infinite;
+      }
+
+      @keyframes boot-pulse {
+        0%,
+        100% {
+          opacity: 0.3;
+          transform: scale(0.8);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.1);
+        }
+      }
+
+      .boot-skeleton__hint {
+        font-size: 11px;
+        color: #52525b;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <!-- 启动骨架 (Vue 挂载后会被替换) -->
+      <div class="boot-skeleton" aria-hidden="true">
+        <div class="boot-skeleton__pulse"></div>
+        <div class="boot-skeleton__title">MBTI · CHAOS · DEBATE</div>
+        <div class="boot-skeleton__hint">正在加载沙盒前端…</div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

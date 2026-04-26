@@ -1,0 +1,307 @@
+/* ==========================================================================
+ * frontend/src/assets/styles/keyframes.css
+ * --------------------------------------------------------------------------
+ * 高级动画关键帧 (与 tailwind.config.js 中 keyframes 互补)
+ *
+ * 使用方式: 组件直接 class="..." 引用本文件中以 .anim-* 命名的工具类。
+ *
+ * 与 tailwind.config.js 的分工:
+ *   tailwind.config.js  → 简单 keyframes + animation utility (aggro-pulse / shake-x / cyber-flash / shadow-shatter / fsm-glow)
+ *   本文件               → 多步骤复合动画 + 工具类 (typewriter caret / scan-line / digital-glitch / aggro 进度条流光 / 接力光晕)
+ * ==========================================================================
+ */
+
+/* --------------------------------------------------------------------------
+ * 1. 打字光标 (供 DebateStream 末尾闪烁光标)
+ * -------------------------------------------------------------------------- */
+@keyframes anim-typewriter-caret {
+  0%,
+  60% {
+    opacity: 1;
+  }
+  70%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.anim-typewriter-caret {
+  display: inline-block;
+  width: 0.5em;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  background: currentColor;
+  animation: anim-typewriter-caret 1.05s steps(1, end) infinite;
+}
+
+/* --------------------------------------------------------------------------
+ * 2. HUD 顶栏扫描线 (低强度环境光,放在 HeaderBar 顶部 1px 高条)
+ * -------------------------------------------------------------------------- */
+@keyframes anim-scan-line {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.6;
+  }
+  80% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.anim-scan-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 24%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(6, 182, 212, 0.85) 50%,
+    transparent 100%
+  );
+  animation: anim-scan-line 6.5s linear infinite;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+ * 3. 数字毛刺 (打断瞬间叠加在 interrupter 名字上)
+ * -------------------------------------------------------------------------- */
+@keyframes anim-digital-glitch {
+  0%,
+  100% {
+    transform: translate(0, 0);
+    text-shadow: none;
+  }
+  10% {
+    transform: translate(-1px, 0);
+    text-shadow:
+      1px 0 rgba(225, 29, 72, 0.85),
+      -1px 0 rgba(6, 182, 212, 0.55);
+  }
+  20% {
+    transform: translate(1px, 0);
+    text-shadow:
+      -1px 0 rgba(225, 29, 72, 0.85),
+      1px 0 rgba(6, 182, 212, 0.55);
+  }
+  35% {
+    transform: translate(0, -1px);
+    text-shadow:
+      0 1px rgba(225, 29, 72, 0.6),
+      0 -1px rgba(6, 182, 212, 0.4);
+  }
+  50% {
+    transform: translate(0, 0);
+    text-shadow: 0 0 6px rgba(225, 29, 72, 0.5);
+  }
+  65% {
+    transform: translate(-1px, 1px);
+    text-shadow:
+      1px -1px rgba(225, 29, 72, 0.7),
+      -1px 1px rgba(6, 182, 212, 0.5);
+  }
+  85% {
+    transform: translate(0, 0);
+    text-shadow: none;
+  }
+}
+
+.anim-digital-glitch {
+  animation: anim-digital-glitch 0.7s steps(1, end) 1;
+}
+
+/* --------------------------------------------------------------------------
+ * 4. Aggro 进度条流光 (Aggro >= 70 时附加在条上,做"沸腾"质感)
+ * -------------------------------------------------------------------------- */
+@keyframes anim-aggro-stream {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.anim-aggro-stream {
+  background-image: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0) 35%,
+    rgba(255, 255, 255, 0.18) 50%,
+    rgba(255, 255, 255, 0) 65%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: anim-aggro-stream 1.6s linear infinite;
+}
+
+/* --------------------------------------------------------------------------
+ * 5. 接力光晕 (新一位 Agent 开始 SPEAKING 时,在其卡片边框上闪一下)
+ * -------------------------------------------------------------------------- */
+@keyframes anim-handoff-glow {
+  0% {
+    box-shadow:
+      0 0 0 0 rgba(255, 255, 255, 0),
+      0 0 0 0 rgba(255, 255, 255, 0) inset;
+  }
+  20% {
+    box-shadow:
+      0 0 24px 0 var(--handoff-color, rgba(6, 182, 212, 0.55)),
+      0 0 1px 0 var(--handoff-color, rgba(6, 182, 212, 0.55)) inset;
+  }
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(255, 255, 255, 0),
+      0 0 0 0 rgba(255, 255, 255, 0) inset;
+  }
+}
+
+.anim-handoff-glow {
+  animation: anim-handoff-glow 0.85s ease-out 1;
+}
+
+/* --------------------------------------------------------------------------
+ * 6. 影子后缀淡入 (TURN_SEALED 后被截断的发言追加 [系统强制截断:...] )
+ * -------------------------------------------------------------------------- */
+@keyframes anim-shadow-suffix-fade {
+  0% {
+    opacity: 0;
+    letter-spacing: 0.2em;
+    filter: blur(3px);
+  }
+  60% {
+    opacity: 0.6;
+    letter-spacing: 0.1em;
+    filter: blur(0.5px);
+  }
+  100% {
+    opacity: 0.8;
+    letter-spacing: 0.04em;
+    filter: blur(0);
+  }
+}
+
+.anim-shadow-suffix-fade {
+  display: inline-block;
+  color: rgba(225, 29, 72, 0.85);
+  animation: anim-shadow-suffix-fade 0.6s ease-out both;
+}
+
+/* --------------------------------------------------------------------------
+ * 7. 议题切换横幅滑入 (TopicBanner 顶部由上滑下)
+ * -------------------------------------------------------------------------- */
+@keyframes anim-topic-slide-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.anim-topic-slide-in {
+  animation: anim-topic-slide-in 0.35s ease-out both;
+}
+
+/* --------------------------------------------------------------------------
+ * 8. 议题切换横幅淡出
+ * -------------------------------------------------------------------------- */
+@keyframes anim-topic-slide-out {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+.anim-topic-slide-out {
+  animation: anim-topic-slide-out 0.25s ease-in both;
+}
+
+/* --------------------------------------------------------------------------
+ * 9. 中央辩论流"摇晃 + 闪红"组合动画 (打断时叠加)
+ * -------------------------------------------------------------------------- */
+.anim-interrupt-combo {
+  /* 同时触发 tailwind 中已定义的 shake-x + cyber-flash */
+  animation:
+    shake-x 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97) 1,
+    cyber-flash 0.6s ease-out 1;
+}
+
+/* --------------------------------------------------------------------------
+ * 10. WS 状态指示灯呼吸 (对应 idle / connecting / open / failed 不同色)
+ * -------------------------------------------------------------------------- */
+@keyframes anim-ws-breath {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.anim-ws-breath {
+  animation: anim-ws-breath 1.6s ease-in-out infinite;
+}
+
+/* --------------------------------------------------------------------------
+ * 11. FSM RETRIEVING 状态的双圈旋转 (供 ISFJ 检索期间)
+ * -------------------------------------------------------------------------- */
+@keyframes anim-rot-cw {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes anim-rot-ccw {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+.anim-rot-cw {
+  animation: anim-rot-cw 2.4s linear infinite;
+}
+
+.anim-rot-ccw {
+  animation: anim-rot-ccw 3.8s linear infinite;
+}
+
+/* --------------------------------------------------------------------------
+ * 12. 减少动画偏好 (无障碍兜底)
+ * -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .anim-typewriter-caret,
+  .anim-scan-line,
+  .anim-digital-glitch,
+  .anim-aggro-stream,
+  .anim-handoff-glow,
+  .anim-shadow-suffix-fade,
+  .anim-topic-slide-in,
+  .anim-topic-slide-out,
+  .anim-interrupt-combo,
+  .anim-ws-breath,
+  .anim-rot-cw,
+  .anim-rot-ccw {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

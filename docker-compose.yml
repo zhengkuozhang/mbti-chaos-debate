@@ -1,0 +1,117 @@
+# ==============================================================================
+# MBTI Chaos Debate · Docker Compose 编排
+# ------------------------------------------------------------------------------
+# 物理隔离原则:
+#   1. Ollama 严禁容器化 —— 必须裸跑于 macOS 宿主机以独占 Metal/GPU。
+#   2. 本编排仅负责 FastAPI 网关、ChromaDB 持久层、Vue 前端三件套。
+#   3. 容器 → 宿主机通信统一走 host.docker.internal:11434。
+# ==============================================================================
+version: "3.9"
+
+name: mbti-chaos-debate
+
+networks:
+  hud_net:
+    driver: bridge
+
+volumes:
+  chroma_data:
+    driver: local
+
+services:
+  # ──────────────────────────────────────────────────────────────────────────
+  # ChromaDB · 向量记忆持久层
+  # 单实例部署，由 backend 通过单线程写入队列 + asyncio.to_thread 读取访问。
+  # ──────────────────────────────────────────────────────────────────────────
+  chromadb:
+    image: chromadb/chroma:0.5.20
+    container_name: mbti_chroma
+    restart: unless-stopped
+    environment:
+      - IS_PERSISTENT=TRUE
+      - ANONYMIZED_TELEMETRY=FALSE
+      - PERSIST_DIRECTORY=/chroma/chroma_data
+    volumes:
+      - chroma_data:/chroma/chroma_data
+    ports:
+      - "127.0.0.1:8001:8000"      # 仅暴露给本机，杜绝外网访问
+    networks:
+      - hud_net
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # FastAPI 推理网关
+  # 通过 host.docker.internal 访问宿主机 Ollama (Metal 直通)。
+  # ──────────────────────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mbti_backend
+    restart: unless-stopped
+    depends_on:
+      chromadb:
+        condition: service_healthy
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+      - APP_ENV=production
+      - OLLAMA_HOST=http://host.docker.internal:11434
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000
+      - GLOBAL_LLM_CONCURRENCY=2          # 算力信号量初始上限 (M2 Max 推荐 2)
+      - LLM_REQUEST_TIMEOUT_SEC=45        # 全局看门狗超时
+      - WS_STATE_PUSH_HZ=10               # 状态推送频率
+      - LOG_LEVEL=INFO
+    ports:
+      - "127.0.0.1:8000:8000"
+    networks:
+      - hud_net
+    extra_hosts:
+      # macOS / Windows Docker Desktop 已内置；Linux 需保留此映射保证一致性。
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys;sys.exit(0 if urllib.request.urlopen('http://localhost:8000/api/sandbox/snapshot',timeout=3).status==200 else 1)"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 1500M
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # 前端 HUD 监控大屏
+  # 多阶段构建产出静态资源，由 nginx 提供。
+  # ──────────────────────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: mbti_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "127.0.0.1:5173:80"
+    networks:
+      - hud_net
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 256M
