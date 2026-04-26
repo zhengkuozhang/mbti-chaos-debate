@@ -1,4 +1,4 @@
-# 🌀 MBTI Chaos Debate · 多智能体混沌辩论模拟器
+# MBTI Chaos Debate · 多智能体混沌辩论模拟器
 
 > **100% 离线运行 · 零成本本地部署 · 高并发沙盒系统**
 > 一个由 8 个差异化 MBTI 人格代理在显式有限状态机下进行实时辩论的混沌沙盒,
@@ -11,7 +11,7 @@
 
 ---
 
-## 📐 一、系统架构总览
+## 一、系统架构总览
 
 ### 1.1 物理隔离拓扑
 
@@ -55,7 +55,7 @@
 
 ---
 
-## 🚀 二、快速开始
+## 二、快速开始
 
 ### 2.1 系统前置要求
 
@@ -67,7 +67,7 @@
 | Homebrew | 4.0 | latest | 用于安装 Ollama |
 | Ollama | 0.5.0 | 0.5.4+ | 必须裸跑于宿主机 |
 
-### 2.2 第一步: 宿主机安装并启动 Ollama (⚠️ 严禁容器化)
+### 2.2 第一步: 宿主机安装并启动 Ollama (严禁容器化)
 
 ```bash
 # 1. 安装 Ollama (推荐 Homebrew)
@@ -90,7 +90,7 @@ ollama pull qwen2.5:3b-instruct-q4_K_M
 ollama list
 ```
 
-**⚠️ 重要**: 切勿用 `ollama serve &` 临时启动 —— 终端关闭后服务会被 SIGHUP 杀死。
+**重要**: 切勿用 `ollama serve &` 临时启动 —— 终端关闭后服务会被 SIGHUP 杀死。
 **必须使用 `brew services` 让 launchd 接管**,以保证 macOS 重启后 Ollama 自动恢复。
 
 ### 2.3 第二步: 配置环境变量
@@ -129,7 +129,7 @@ docker compose ps
 
 ---
 
-## ⚙️ 三、关键配置项详解
+## 三、关键配置项详解
 
 ### 3.1 算力控流 (`GLOBAL_LLM_CONCURRENCY`)
 
@@ -156,7 +156,7 @@ $$A_t = \max\left(0, \min\left(A_{max}, A_{max} - (A_{max} - A_{t-1}) \cdot e^{-
 
 ---
 
-## 🎭 四、8 个 MBTI 代理速览
+## 四、8 个 MBTI 代理速览
 
 | Agent | 阵营 | 核心特征 | λ (1/s) | 关键能力 |
 |-------|------|---------|---------|---------|
@@ -171,7 +171,7 @@ $$A_t = \max\left(0, \min\left(A_{max}, A_{max} - (A_{max} - A_{t-1}) \cdot e^{-
 
 ---
 
-## 🛠️ 五、故障诊断 Runbook
+## 五、故障诊断 Runbook
 
 ### 5.1 症状: HUD 大屏空白 / WS 连接失败
 
@@ -226,7 +226,7 @@ docker compose up -d backend  # 仅重启 backend 即可生效
 
 ---
 
-## 🔥 六、已规避的工程地雷 (维护者必读)
+## 六、已规避的工程地雷 (维护者必读)
 
 | # | 陷阱 | 本项目对策 |
 |---|------|-----------|
@@ -243,7 +243,7 @@ docker compose up -d backend  # 仅重启 backend 即可生效
 
 ---
 
-## 📂 七、目录结构概览
+## 七、目录结构概览
 
 mbti-chaos-debate/
 ├── docker-compose.yml      # 编排 · 仅 3 个容器,Ollama 在外
@@ -264,7 +264,7 @@ mbti-chaos-debate/
 
 ---
 
-## 🛑 八、停止与清理
+## 八、停止与清理
 
 ```bash
 # 优雅停止 (会触发 lifespan shutdown · 信号量释放 · WS BYE 包推送)
@@ -279,13 +279,10 @@ brew services stop ollama
 
 ---
 
-## 📜 九、许可与致谢
+## 九、许可与致谢
 
 - License: **MIT**
 - 推理引擎: [Ollama](https://ollama.com/) · [Qwen2.5](https://github.com/QwenLM/Qwen2.5)
 - 向量库: [ChromaDB](https://www.trychroma.com/)
 - 前端: [Vue 3](https://vuejs.org/) · [Tailwind CSS](https://tailwindcss.com/) · [VueUse](https://vueuse.org/)
 - 字体: [JetBrains Mono](https://www.jetbrains.com/lp/mono/) · [Inter](https://rsms.me/inter/)
-
-> 本项目以「工程现实」为最高优先级,所有设计决策均经过死锁与 OOM 推演。
-> 任何看似多余的复杂度,都是某个深夜踩过的坑的墓志铭。
