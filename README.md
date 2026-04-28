@@ -303,4 +303,3 @@ brew services stop ollama
 - **前端可视化技术栈**：[Vue 3](https://vuejs.org/) · [Tailwind CSS](https://tailwindcss.com/) · [VueUse](https://vueuse.org/)
 
 - **界面专用字体**：[JetBrains Mono](https://www.jetbrains.com/lp/mono/) · [Inter](https://rsms.me/inter/)
-> （注：文档部分内容可能由 AI 生成）
